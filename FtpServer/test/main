@@ -1,0 +1,5 @@
+require 'ftp_server'
+root = "D:\\ ";
+
+server = FTPServer.new(:root => root)
+server.run
