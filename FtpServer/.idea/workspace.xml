@@ -24,10 +24,28 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ftp_server.rb" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ftp_server.rb" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/ftp_server.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="59" selection-start="308" selection-end="308" vertical-scroll-proportion="0.22666667">
+            <state line="156" column="42" selection-start="3798" selection-end="3798" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="vfs.rb" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/vfs.rb">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="20" column="41" selection-start="495" selection-end="495" vertical-scroll-proportion="0.37777779">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="main" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/main">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="6" column="0" selection-start="114" selection-end="114" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -48,8 +66,11 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/test/dyn_ftp_server.rb" />
-        <option value="$PROJECT_DIR$/test/main" />
+        <option value="$PROJECT_DIR$/file_system.rb" />
+        <option value="$PROJECT_DIR$/test/file_system.rb" />
         <option value="$PROJECT_DIR$/test/ftp_server.rb" />
+        <option value="$PROJECT_DIR$/test/vfs.rb" />
+        <option value="$PROJECT_DIR$/test/main" />
       </list>
     </option>
   </component>
@@ -80,7 +101,6 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="Favorites" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -105,6 +125,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Favorites" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -226,7 +247,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32821077" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13540569" sideWeight="0.68392664" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16069546" sideWeight="0.68392664" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39805827" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31607336" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -272,14 +293,21 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/test/main">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="0" selection-start="76" selection-end="76" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/ftp_server.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="59" selection-start="308" selection-end="308" vertical-scroll-proportion="0.22666667">
+        <state line="156" column="42" selection-start="3798" selection-end="3798" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/main">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="0" selection-start="114" selection-end="114" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/vfs.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="41" selection-start="495" selection-end="495" vertical-scroll-proportion="0.37777779">
           <folding />
         </state>
       </provider>

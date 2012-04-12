@@ -43,11 +43,12 @@ class FTPServer
 
     thread[:authenticated] = false
     thread[:cwd] = @config[:root]
-    status(220, "Microsoft FTP Server ready")
+    status(220, "Ruby FTP Server ready")
 
     while (thread[:socket] && (s = thread[:socket].gets))
       s.chomp!                        # remove record separator from the end of str
       log.debug "Request: #{s}"
+
       params = s.split(' ', 2)
       command = params.first
       command.downcase! if command
@@ -123,6 +124,37 @@ class FTPServer
     else
       status 530
     end
+  end
+
+  def cmd_pwd(params)
+    status 257, "\"#{ get_path(thread[:cwd]).gsub('"', '""') }\" is the current directory"
+  end
+
+   def get_path(object)
+    return '/' unless object
+    return '/' if object == @config[:root]
+    result = ''
+    while object do
+      result = '/' + object.ftp_name + result
+      object = object.ftp_parent
+    end
+    return result
+  end
+
+  def get_quoted_path(object)
+    get_path(object).gsub('"', '""')
+  end
+
+  def cmd_cdup(params)
+    thread[:cwd] = thread[:cwd].ftp_parent
+    thread[:cwd] = @config[:root] unless thread[:cwd]
+    status(250, 'Directory successfully changed.')
+  end
+
+  def cmd_list(params)
+
+    list = thread[:cwd].ftp_list
+    list.each {|file| thread[:socket].puts(file.ftp_name + "\r\n") }
   end
 
 end

@@ -1,5 +1,6 @@
 require 'ftp_server'
-root = "D:\\ ";
+require 'vfs'
+root = FileSystem.new("D:/")
 
 server = FTPServer.new(:root => root)
 server.run
