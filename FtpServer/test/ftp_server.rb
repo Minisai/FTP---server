@@ -40,15 +40,12 @@ class FTPServer
    end
 
    def client_loop
-
     thread[:authenticated] = false
     thread[:cwd] = @config[:root]
     status(220, "Ruby FTP Server ready")
-
     while (thread[:socket] && (s = thread[:socket].gets))
       s.chomp!                        # remove record separator from the end of str
       log.debug "Request: #{s}"
-
       params = s.split(' ', 2)
       command = params.first
       command.downcase! if command
@@ -60,7 +57,6 @@ class FTPServer
         status(500);
       end
     end
-
     thread[:socket].close if thread[:socket] and not thread[:socket].closed?
     thread[:socket] = nil
     thread[:data_socket].close if thread[:data_socket] and not thread[:data_socket].closed?
@@ -73,7 +69,6 @@ class FTPServer
       thread[:socket].puts code.to_s + ' ' + info + "\r\n"
       return
      end
-
     case (code.to_i)
     when 125
       status(code, 'Data connection already open; transfer starting.')
@@ -152,9 +147,42 @@ class FTPServer
   end
 
   def cmd_list(params)
-
     list = thread[:cwd].ftp_list
     list.each {|file| thread[:socket].puts(file.ftp_name + "\r\n") }
+  end
+
+  def cmd_cwd(path)
+    if (newpath = open_path(path))
+      thread[:cwd] = newpath
+      status(250, 'Directory successfully changed.')
+    else
+      status(550, 'Failed to change directory.')
+    end
+  end
+
+  def open_path(path)
+    result = open_object(path)
+    result = nil if result && !result.ftp_dir
+    return result
+  end
+
+  def open_object(path)
+    if (path[0,1] == '/') || (path.is_a?(Array) && (path[0] == ''))
+      dir = @config[:root]
+    else
+      dir = thread[:cwd]
+    end
+    path = path.split('/') unless path.is_a?(Array)
+    return dir if path.empty?
+    last_element = path.pop
+    path.each do |p|
+      unless p == ''
+        dir = dir.ftp_list.detect {|d| (d.ftp_name.casecmp(p) == 0) && (d.ftp_dir) }
+        return nil unless dir
+      end
+    end
+    dir = dir.ftp_list.detect {|d| (d.ftp_name.casecmp(last_element) == 0) } unless last_element == ''
+    return dir
   end
 
 end
