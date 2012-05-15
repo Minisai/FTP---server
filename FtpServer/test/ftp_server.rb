@@ -2,6 +2,7 @@ require "socket"
 
 class FTPServer
    def initialize(conf)
+    @rnto_file = nil
     @config = {
       :host => 'localhost',
       :port => 21,
@@ -203,6 +204,10 @@ class FTPServer
   end
 
   def cmd_dele(path)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
     if (file = open_file(path)) && file.ftp_delete(false)
       status 250
     else
@@ -236,6 +241,10 @@ class FTPServer
   end
 
   def cmd_mkd(path)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
     dir = open_object(path)
     if (dir)
       status 521, "Directory already exists"
@@ -265,6 +274,10 @@ class FTPServer
   end
 
   def cmd_rmd(path)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
     if (dir = open_path(path)) && dir.ftp_delete(true)
       status 250
     else
@@ -301,6 +314,10 @@ class FTPServer
   end
 
   def cmd_retr(path)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
     if (file = open_file(path))
       data_connection do |data_socket|
         if file.ftp_retrieve(data_socket)
@@ -326,6 +343,10 @@ class FTPServer
   end
 
   def cmd_stor(path)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
     file = open_file(path)
     if file
       status 553, 'Could not create file.'
@@ -357,4 +378,38 @@ class FTPServer
   def cmd_type(type)
     status 200, "Type set."
   end
+
+  def cmd_rnfr(path)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
+    if (@rnto_file = open_file(path))
+      status(350, 'Rename from accepted. Waiting for RNTO')
+    else
+      if(@rnto_file = open_path(path))
+        status(350, 'Rename from accepted. Waiting for RNTO')
+      else
+        status(550, 'File doesnt exist')
+      end
+    end
+  end
+
+  def cmd_rnto(name)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
+    if(!@rnto_file)
+      status(400, 'RNTO requires a valid previous RNFR')
+    else
+      if (@rnto_file.ftp_rename(name))
+        status(250, 'File renamed')
+      else
+        status(550, 'RNTO error')
+      end
+      @rnto_file = nil
+    end
+  end
+
 end

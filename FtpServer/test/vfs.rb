@@ -25,11 +25,11 @@ class FileSystem
     end
 
     def ftp_retrieve(output)
-      output << File.new(@path, 'r').read
+      output << File.new(@path, 'rb').read
     end
 
     def ftp_store(input)
-      return false unless File.open(@path, 'w') do |f|
+      return false unless File.open(@path, 'wb') do |f|
         f.write input.read
       end
       @ftp_size = File.size?(@path)
@@ -39,7 +39,7 @@ class FileSystem
     def ftp_delete(dir = false)
       if dir
         begin
-        if Dir.rmdir(@path)
+        if Dir.delete(@path)#.rmdir(@path)
           return true
         end
         rescue SystemCallError
@@ -50,6 +50,15 @@ class FileSystem
           return true
         end
      end
+      return false
+    end
+
+    def ftp_rename(name,dir = false)
+      new_path = @path.clone
+      new_path[(@path.length - @path.split('/').last.length - 1)..@path.length] = name
+      if File.rename(@path, new_path)
+          return true
+      end
       return false
     end
 

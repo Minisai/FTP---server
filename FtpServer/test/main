@@ -1,6 +1,11 @@
 require 'ftp_server'
 require 'vfs'
-root = FileSystem.new("D:/")
+
+if(Dir.open("D:/"))
+  root = FileSystem.new("D:/")
+else
+  root = FileSystem.new("/home")
+end
 
 server = FTPServer.new(:root => root)
 server.run
