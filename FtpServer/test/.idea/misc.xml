@@ -3,6 +3,6 @@
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
-  <component name="ProjectRootManager" version="2" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="jruby-1.6.7-p357" project-jdk-type="JRUBY_SDK" />
 </project>
 
