@@ -1,3 +1,4 @@
+# coding: utf-8
 class FileSystem
   attr_reader :ftp_name, :ftp_size, :ftp_dir, :ftp_date, :ftp_parent
 
@@ -25,12 +26,22 @@ class FileSystem
     end
 
     def ftp_retrieve(output)
-      output << File.new(@path, 'rb').read
+      File.new(@path, 'rb').each{|line|
+        if(@abort_flag)
+          return
+        end
+        output << line}
+      #output << File.new(@path, 'rb').read
     end
 
     def ftp_store(input)
       return false unless File.open(@path, 'wb') do |f|
-        f.write input.read
+        input.each{|line|
+          if(@abort_flag)
+           return
+          end
+          f.write line}
+        #f.write input.read
       end
       @ftp_size = File.size?(@path)
       @ftp_date = File.mtime(@path) if File.exists?(@path)
@@ -61,6 +72,9 @@ class FileSystem
       end
       return false
     end
+    def ftp_abort(state)
+       @abort_flag = state
+    end
 
     def initialize(path, parent = nil)
       @path = path
@@ -73,5 +87,6 @@ class FileSystem
       @ftp_size = 0 unless @ftp_size
       @ftp_date = Time.now
       @ftp_date = File.mtime(path) if File.exists?(path)
+      @abort_flag = false
     end
 end

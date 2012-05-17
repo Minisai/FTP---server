@@ -1,8 +1,10 @@
 require "socket"
 
+# coding: utf-8
 class FTPServer
    def initialize(conf)
     @rnto_file = nil
+    @file = nil
     @config = {
       :host => 'localhost',
       :port => 21,
@@ -128,18 +130,29 @@ class FTPServer
    def open_object(path)
     if (path[0,1] == '/') || (path.is_a?(Array) && (path[0] == ''))
       dir = @config[:root]
+      puts "1"
     else
       dir = thread[:cwd]
+      puts "2"
     end
     path = path.split('/') unless path.is_a?(Array)
+    puts "3"
     return dir if path.empty?
+    puts "4"
     last_element = path.pop
+    puts path[1]
+    #puts path.length
+    #path.each {|p| puts p}
+    puts "5"+ last_element
     path.each do |p|
+      puts "5a"+p
       unless p == ''
+        puts "6"
         dir = dir.ftp_list.detect {|d| (d.ftp_name.casecmp(p) == 0) && (d.ftp_dir) }
         return nil unless dir
       end
     end
+    puts "7"
     dir = dir.ftp_list.detect {|d| (d.ftp_name.casecmp(last_element) == 0) } unless last_element == ''
     return dir
   end
@@ -318,9 +331,10 @@ class FTPServer
      status 530
      return
     end
-    if (file = open_file(path))
+    if (@file = open_file(path))
+      @file.ftp_abort(false)
       data_connection do |data_socket|
-        if file.ftp_retrieve(data_socket)
+        if @file.ftp_retrieve(data_socket)
           status 226, 'Transfer complete'
         else
           status(550, 'Failed to open file.')
@@ -347,26 +361,38 @@ class FTPServer
      status 530
      return
     end
-    file = open_file(path)
-    if file
+    @file = open_file(path)
+
+    if @file
       status 553, 'Could not create file.'
       return
     end
-    unless file
+    unless @file
       splitted_path = path.split('/')
       filename = splitted_path.pop
       dir = open_path(splitted_path)
-      file = dir.ftp_create(filename) if dir
+      @file = dir.ftp_create(filename) if dir
     end
-    if file
+    if @file
+      @file.ftp_abort(false)
       data_connection do |data_socket|
-        file.ftp_store(data_socket)
+        @file.ftp_store(data_socket)
       end
       status 226, 'Transfer complete'
     else
       status 550, 'Failed to open file.'
     end
 
+    thread[:data_socket].close if thread[:data_socket]
+    thread[:data_socket] = nil
+  end
+
+  def cmd_abor(path)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
+    @file.ftp_abort(true)
     thread[:data_socket].close if thread[:data_socket]
     thread[:data_socket] = nil
   end
