@@ -130,29 +130,19 @@ class FTPServer
    def open_object(path)
     if (path[0,1] == '/') || (path.is_a?(Array) && (path[0] == ''))
       dir = @config[:root]
-      puts "1"
     else
       dir = thread[:cwd]
-      puts "2"
     end
     path = path.split('/') unless path.is_a?(Array)
-    puts "3"
     return dir if path.empty?
-    puts "4"
     last_element = path.pop
     puts path[1]
-    #puts path.length
-    #path.each {|p| puts p}
-    puts "5"+ last_element
     path.each do |p|
-      puts "5a"+p
       unless p == ''
-        puts "6"
         dir = dir.ftp_list.detect {|d| (d.ftp_name.casecmp(p) == 0) && (d.ftp_dir) }
         return nil unless dir
       end
     end
-    puts "7"
     dir = dir.ftp_list.detect {|d| (d.ftp_name.casecmp(last_element) == 0) } unless last_element == ''
     return dir
   end
@@ -192,11 +182,23 @@ class FTPServer
   end
 
   def cmd_user(params)
+    if (!params || params.include?(' '))
+      status 501, "Invalid user name"
+      return
+    end
+    if (params.length > 10)
+      status 501, "Too long user name"
+      return
+    end
     thread[:user] = params
     status(331)
   end
 
   def cmd_pass(params)
+    if (!params || params.include?(' '))
+      status 501, "Invalid password"
+      return
+    end
     thread[:pass] = params
     if (thread[:user]!=nil && thread[:pass]!=nil)
       thread[:authenticated] = true
@@ -211,6 +213,10 @@ class FTPServer
   end
 
   def cmd_cdup(params)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
     thread[:cwd] = thread[:cwd].ftp_parent
     thread[:cwd] = @config[:root] unless thread[:cwd]
     status(250, 'Directory successfully changed.')
@@ -235,6 +241,10 @@ class FTPServer
   end
 
   def cmd_list(params)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
     data_connection do |data_socket|
       list = thread[:cwd].ftp_list
       list.each {|file| data_socket.puts((file.ftp_dir ? 'd': '-') + 'rw-rw-rw- 1 ftp ftp ' + file.ftp_size.to_s + ' ' + file.ftp_date.strftime('%b %d %H:%M') + ' ' + file.ftp_name + "\r\n") }
@@ -267,13 +277,17 @@ class FTPServer
     mkdir = splitted_path.pop
     dir = open_path(splitted_path)
     if dir && (newone = dir.ftp_create(mkdir, true))
-      status 257, "\"#{ get_path(thread[:cwd]).gsub('"', '""') +path }\" directory created."            #KOKO"\"#{ get_path(thread[:cwd]).gsub('"', '""') }\"
+      status 257, "\"#{ get_path(thread[:cwd]).gsub('"', '""') +path }\" directory created."
     else
       status 550
     end
   end
 
   def cmd_cwd(path)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
     if path == '' || !path
       status(550, 'Failed to change directory.')
       return
@@ -299,8 +313,15 @@ class FTPServer
   end
 
  def cmd_port(ip_port)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
     s = ip_port.split(',')
     port = s[4].to_i * 256 + s[5].to_i
+    if (port < 1024 && port > 65535)
+      status 425, "Error port range"
+    end
     host = s[0..3].join('.')
     if thread[:data_socket]
       thread[:data_socket].close
@@ -312,11 +333,15 @@ class FTPServer
   end
 
   def cmd_pasv(params)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
     if thread[:data_socket]
       thread[:data_socket].close
       thread[:data_socket] = nil
     end
-    thread[:data_socket] = TCPServer.new('localhost', 0)
+    thread[:data_socket] = TCPServer.new(@config[:host] , 0)
     thread[:passive] = true
     port = thread[:data_socket].addr[1]
     port_lo = port & "0x00FF".hex
@@ -349,6 +374,10 @@ class FTPServer
   end
 
   def cmd_size(path)
+    if (!thread[:authenticated])
+     status 530
+     return
+    end
     if (file = open_file(path))
       status 213, file.ftp_size.to_s
     else
